@@ -1,0 +1,53 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ---------- smog overlay global styles ---------- */
+
+html,
+body,
+#root {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  width: 100%;
+}
+
+body {
+  /* The Electron window itself is transparent; this makes the app body
+     transparent so the rounded glass panel "floats". */
+  background: transparent;
+  overflow: hidden;
+  user-select: none;
+  font-family: theme('fontFamily.sans');
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Thin custom scrollbars for the overlay */
+.smog-scroll::-webkit-scrollbar {
+  width: 6px;
+}
+.smog-scroll::-webkit-scrollbar-track {
+  background: transparent;
+}
+.smog-scroll::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.18);
+  border-radius: 9999px;
+}
+.smog-scroll::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.3);
+}
+
+/* Make textareas / inputs selectable inside the overlay */
+input,
+textarea {
+  user-select: text;
+}
+
+/* Drag region for the frameless window header */
+.drag-region {
+  -webkit-app-region: drag;
+}
+.no-drag {
+  -webkit-app-region: no-drag;
+}
