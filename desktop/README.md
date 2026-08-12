@@ -1,34 +1,45 @@
-# desktop
+# smog — desktop overlay
 
-An Electron application with React and TypeScript
+The Electron app half of the smog POC. See the [root README](../README.md) for the full overview.
 
-## Recommended IDE Setup
-
-- [VSCode](https://code.visualstudio.com/) + [ESLint](https://marketplace.visualstudio.com/items?itemName=dbaeumer.vscode-eslint) + [Prettier](https://marketplace.visualstudio.com/items?itemName=esbenp.prettier-vscode)
-
-## Project Setup
-
-### Install
+## Run
 
 ```bash
-$ npm install
+npm install
+npm run dev
 ```
 
-### Development
+A translucent, always-on-top overlay appears (top-right). Open **Settings** (gear) and paste your
+OpenAI API key to enable **Ask**, **Notes**, and the **Whisper** engine. The **Web Speech** engine
+works with no key.
 
-```bash
-$ npm run dev
-```
+## Modules
 
-### Build
+- **Listen** — live transcription. Two engines (toggle in Settings):
+  - Web Speech API (default) — real-time, no key. Can be unreliable in Electron; if it errors, switch to Whisper.
+  - Whisper API — more accurate, needs an OpenAI key.
+- **Ask** — type a question (recent transcript is attached as context); the answer streams in. Push-to-ask: `Ctrl+Shift+A`.
+- **Notes** — generate structured Markdown from the transcript; edit, copy, or download `.md`.
 
-```bash
-# For windows
-$ npm run build:win
+## Global shortcuts
 
-# For macOS
-$ npm run build:mac
+| Action | Shortcut |
+| --- | --- |
+| Show / hide overlay | `Ctrl+Shift+Space` |
+| Push-to-Ask | `Ctrl+Shift+A` |
+| Start / stop listening | `Ctrl+Shift+L` |
 
-# For Linux
-$ npm run build:linux
-```
+(`Cmd` on macOS.) There's also a tray icon (show/hide, settings, quit).
+
+## Architecture
+
+- `src/main/` — Electron main process: overlay window, tray, global shortcuts, IPC, local settings store.
+- `src/preload/` — secure `contextBridge` API exposed as `window.smog` (contextIsolation on, nodeIntegration off).
+- `src/renderer/` — React UI: `App` shell + `ListenPanel` / `AskPanel` / `NotesPanel` / `SettingsPanel`, plus `lib/` (OpenAI streaming + notes, and the two STT engines).
+- `src/shared/types.ts` — `Settings` shape shared across processes.
+
+## Scripts
+
+- `npm run dev` — run the app (HMR).
+- `npm run build` — typecheck + production build to `out/`.
+- `npm run build:win` — build a Windows installer via electron-builder.
