@@ -7,6 +7,10 @@ Free, open-source overlay: live transcription, instant answers, and notes. Bring
 
 > **Positioning.** A local live copilot (meetings, practice, captioning, language learning). The overlay is a UX feature. Deliberately **out of scope**: hidden-from-capture / “undetectable” mechanics, hosted tokens, and paid plans.
 
+**Status.** smog is in beta. Listen, Ask, Notes, and bring-your-own-key work today; there is still plenty to fix. Issues and pull requests are welcome.
+
+**Site:** [smog-web-somg.vercel.app](https://smog-web-somg.vercel.app)
+
 ## Screenshots
 
 Spoken questions are detected in the transcript and answered on Listen.
@@ -70,7 +74,7 @@ npm install
 npm run dev
 ```
 
-Open the printed local URL to view the site.
+Open the printed local URL to view the site, or the live page at [smog-web-somg.vercel.app](https://smog-web-somg.vercel.app).
 
 ---
 
@@ -80,3 +84,11 @@ Open the printed local URL to view the site.
 
 ## Responsible use
 Use it ethically — e.g., as a personal accessibility, captioning, or note-taking assistant. Settings (including your API key) are stored locally and never leave your machine except as direct calls to OpenAI.
+
+## Contributing
+
+1. Fork the repo and create a branch.
+2. Desktop changes go in `desktop/`. Landing-page changes go in `web/`.
+3. Open a pull request that says what you changed and how to try it.
+
+Bugs and ideas: [open an issue](https://github.com/majdaleid/smog/issues).
