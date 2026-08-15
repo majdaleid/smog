@@ -1,12 +1,13 @@
-import { Download } from "lucide-react";
 import { Logo } from "@/components/logo";
+import { GithubIcon } from "@/components/github-icon";
 import { cn } from "@/lib/utils";
 import { buttonVariants } from "@/components/ui/button";
+import { GITHUB_URL } from "@/lib/site";
 
 const navLinks = [
   { label: "Features", href: "#features" },
   { label: "How it works", href: "#how-it-works" },
-  { label: "Pricing", href: "#pricing" },
+  { label: "Get started", href: "#get-started" },
   { label: "FAQ", href: "#faq" },
 ];
 
@@ -35,14 +36,16 @@ export function Navbar() {
         </nav>
 
         <a
-          href="#download"
+          href={GITHUB_URL}
+          target="_blank"
+          rel="noreferrer"
           className={cn(
             buttonVariants({ variant: "default", size: "sm" }),
             "h-9 gap-1.5 px-4 text-sm",
           )}
         >
-          <Download className="size-4" aria-hidden="true" />
-          Download
+          <GithubIcon className="size-4" />
+          GitHub
         </a>
       </div>
     </header>

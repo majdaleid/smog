@@ -18,6 +18,8 @@ export interface Settings {
   theme: 'dark' | 'light'
   /** How many recent transcript lines to attach as Ask context. */
   contextLines: number
+  /** When listening, detect spoken questions and stream an answer on Listen. */
+  autoAnswer: boolean
 }
 
 export const DEFAULT_SETTINGS: Settings = {
@@ -26,5 +28,6 @@ export const DEFAULT_SETTINGS: Settings = {
   sttEngine: 'webspeech',
   language: 'en-US',
   theme: 'dark',
-  contextLines: 20
+  contextLines: 20,
+  autoAnswer: true
 }

@@ -20,3 +20,14 @@ export interface SttEngine {
   start(opts: SttStartOptions): void
   stop(): void
 }
+
+export type QASource = 'manual' | 'auto'
+
+export interface QAItem {
+  id: string
+  question: string
+  answer: string
+  source: QASource
+  /** Transcript line that triggered an auto-answer, if any. */
+  transcriptId?: string
+}

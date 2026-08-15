@@ -14,9 +14,9 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://smog-ai.com"),
-  title: "smog — see the answers, live",
+  title: "smog — free open-source live copilot",
   description:
-    "A translucent AI copilot that overlays your calls. Live transcription, instant context-aware answers, and auto-generated notes — always on top, never in the way.",
+    "A free, open-source overlay for your calls. Live transcription, instant answers, and notes — bring your own OpenAI key and run it locally.",
   keywords: [
     "AI copilot",
     "live transcription",
@@ -27,18 +27,18 @@ export const metadata: Metadata = {
   ],
   authors: [{ name: "smog" }],
   openGraph: {
-    title: "smog — see the answers, live",
+    title: "smog — free open-source live copilot",
     description:
-      "A translucent AI copilot that overlays your calls. Live transcription, instant answers, auto notes.",
+      "A free, open-source overlay for your calls. Live transcription, instant answers, notes. Bring your own OpenAI key.",
     type: "website",
     url: "https://smog-ai.com",
     siteName: "smog",
   },
   twitter: {
     card: "summary_large_image",
-    title: "smog — see the answers, live",
+    title: "smog — free open-source live copilot",
     description:
-      "A translucent AI copilot that overlays your calls. Live transcription, instant answers, auto notes.",
+      "A free, open-source overlay for your calls. Live transcription, instant answers, notes. Bring your own OpenAI key.",
   },
 };
 

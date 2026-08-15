@@ -14,32 +14,32 @@ const faqs: Faq[] = [
   {
     question: "Does it work on Mac and Windows?",
     answer:
-      "Yes. smog runs natively on macOS (Apple silicon and Intel) and Windows 10/11. It floats as a translucent overlay over any window, so it works with Zoom, Google Meet, Teams, browsers, and IDEs alike. Linux support is on the roadmap.",
+      "Yes. The Electron overlay runs on macOS and Windows 10/11. Linux can be built from source. It floats over Zoom, Meet, Teams, browsers, and IDEs.",
   },
   {
-    question: "Is it detectable?",
+    question: "Do I need to pay for smog?",
     answer:
-      "smog is a desktop overlay that renders on top of your screen — it isn't injected into other apps and doesn't hook into their processes. Whether using it is appropriate depends on your context; always follow the rules of your platform, employer, and local laws. We don't condone using smog to deceive anyone.",
-  },
-  {
-    question: "Which AI models does smog use?",
-    answer:
-      "Starter uses GPT-4o-mini for fast, economical answers. Pro and Lifetime use GPT-4o for higher-quality, context-aware responses. On Lifetime you can bring your own OpenAI key and choose any model you prefer.",
-  },
-  {
-    question: "How is my data handled?",
-    answer:
-      "Audio is transcribed locally where possible and streamed only when needed to generate answers. Transcripts and notes are stored on your device, and we never sell your data or use it to train models. You can delete everything at any time.",
+      "No. smog is free and open source under the MIT license. You bring your own OpenAI API key and pay OpenAI for the usage you generate.",
   },
   {
     question: "Can I use my own API key?",
     answer:
-      "Yes. The Lifetime plan lets you plug in your own OpenAI key, so requests run entirely under your account and billing — giving you full control over model choice, usage limits, and data residency.",
+      "Yes — that is the only way it works. Paste your OpenAI key in the overlay on first launch (or later in Settings). The key stays on your machine and is only sent to OpenAI.",
   },
   {
-    question: "What's included in the free Starter plan?",
+    question: "Which models can I use?",
     answer:
-      "The translucent overlay, live transcription, GPT-4o-mini answers up to a monthly token limit, basic notes export, and stealth mode — enough to take smog for a real spin on your next call.",
+      "The default is gpt-4o-mini. You can switch to gpt-4o in Settings. Requests run on your OpenAI account.",
+  },
+  {
+    question: "How is my data handled?",
+    answer:
+      "Settings and your API key are stored locally. Transcripts and notes live in memory for the session. Audio and chat go to OpenAI only when you use Whisper, Ask, auto-answer, or Notes. smog does not run a backend or sell data.",
+  },
+  {
+    question: "Is it hidden from screen share?",
+    answer:
+      "No. The overlay is a normal always-on-top window. To keep it off someone else's feed, share a single window or another monitor — not the whole desktop.",
   },
 ];
 
@@ -50,7 +50,7 @@ export function Faq() {
         <SectionHeading
           eyebrow="FAQ"
           title="Questions, answered"
-          description="Everything you might want to know before you hit download."
+          description="What the MVP actually is — and what it is not."
         />
 
         <div className="glass mt-12 rounded-2xl bg-white/[0.04] px-5 py-2 sm:px-7">

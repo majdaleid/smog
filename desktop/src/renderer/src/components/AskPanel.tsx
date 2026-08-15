@@ -1,40 +1,27 @@
 import { useEffect, useRef, useState } from 'react'
 import { Send, Sparkles, Square } from 'lucide-react'
-import { askQuestion } from '../lib/openai'
-import { recentContext } from '../lib/stt'
-import type { TranscriptItem } from '../lib/types'
-
-interface QAItem {
-  id: string
-  question: string
-  answer: string
-}
+import type { QAItem } from '../lib/types'
 
 interface AskPanelProps {
-  transcript: TranscriptItem[]
-  contextLines: number
+  history: QAItem[]
+  streaming: boolean
+  error: string | null
   apiKey: string
-  model: string
   inputRef: React.RefObject<HTMLTextAreaElement | null>
-}
-
-function uid(): string {
-  if (typeof crypto !== 'undefined' && crypto.randomUUID) return crypto.randomUUID()
-  return `id-${Date.now()}-${Math.random().toString(36).slice(2)}`
+  onSubmit: (question: string) => void
+  onStop: () => void
 }
 
 export default function AskPanel({
-  transcript,
-  contextLines,
+  history,
+  streaming,
+  error,
   apiKey,
-  model,
-  inputRef
+  inputRef,
+  onSubmit,
+  onStop
 }: AskPanelProps): React.JSX.Element {
   const [question, setQuestion] = useState('')
-  const [history, setHistory] = useState<QAItem[]>([])
-  const [streaming, setStreaming] = useState(false)
-  const [error, setError] = useState<string | null>(null)
-  const abortRef = useRef<AbortController | null>(null)
   const scrollRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
@@ -46,50 +33,17 @@ export default function AskPanel({
     if (el) el.scrollTop = el.scrollHeight
   }, [history])
 
-  async function submit(): Promise<void> {
+  function submit(): void {
     const q = question.trim()
-    if (!q || streaming) return
-    setError(null)
+    if (!q) return
     setQuestion('')
-    const id = uid()
-    setHistory((h) => [...h, { id, question: q, answer: '' }])
-    setStreaming(true)
-    const controller = new AbortController()
-    abortRef.current = controller
-    const context = recentContext(transcript, contextLines)
-
-    await askQuestion({
-      apiKey,
-      model,
-      question: q,
-      context,
-      signal: controller.signal,
-      onDelta: (tok) =>
-        setHistory((h) =>
-          h.map((it) => (it.id === id ? { ...it, answer: it.answer + tok } : it))
-        ),
-      onDone: () => {
-        setStreaming(false)
-        abortRef.current = null
-      },
-      onError: (msg) => {
-        setError(msg)
-        setStreaming(false)
-        abortRef.current = null
-      }
-    })
-  }
-
-  function stop(): void {
-    abortRef.current?.abort()
-    abortRef.current = null
-    setStreaming(false)
+    onSubmit(q)
   }
 
   function onKey(e: React.KeyboardEvent<HTMLTextAreaElement>): void {
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault()
-      void submit()
+      submit()
     }
   }
 
@@ -101,6 +55,7 @@ export default function AskPanel({
             <Sparkles size={22} className="opacity-50" />
             <p className="max-w-[220px] text-xs">
               Ask anything. smog attaches your recent transcript as context and streams the answer.
+              Spoken questions also land here.
             </p>
             {!apiKey && (
               <p className="text-[11px] text-amber-200/80">Add your OpenAI key in Settings.</p>
@@ -109,6 +64,9 @@ export default function AskPanel({
         ) : (
           history.map((it) => (
             <div key={it.id} className="space-y-1.5">
+              {it.source === 'auto' && (
+                <div className="text-right text-[10px] text-white/40">From transcript</div>
+              )}
               <div className="ml-auto max-w-[85%] rounded-lg rounded-br-sm bg-accent/25 px-2.5 py-1.5 text-xs text-white">
                 {it.question}
               </div>
@@ -139,7 +97,7 @@ export default function AskPanel({
         {streaming ? (
           <button
             type="button"
-            onClick={stop}
+            onClick={onStop}
             title="Stop"
             className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border border-white/15 bg-white/10 text-white/80 hover:bg-white/20"
           >
@@ -148,7 +106,7 @@ export default function AskPanel({
         ) : (
           <button
             type="button"
-            onClick={() => void submit()}
+            onClick={submit}
             disabled={!question.trim()}
             title="Send"
             className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-accent text-white disabled:cursor-not-allowed disabled:opacity-40"

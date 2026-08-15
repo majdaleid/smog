@@ -3,7 +3,8 @@
  * smog — backend verification.
  *
  * Exercises the SAME OpenAI requests the desktop app makes (Ask streaming + Notes),
- * using the key already saved in the app's local settings (or OPENAI_API_KEY).
+ * plus a no-network check of detectQuestion (spoken-question detector).
+ * Uses the key already saved in the app's local settings (or OPENAI_API_KEY).
  * No mic, no GUI required — this proves the AI plumbing works with your key + model.
  *
  *   node scripts/verify.mjs
@@ -15,6 +16,66 @@ import path from 'node:path'
 import os from 'node:os'
 
 const API = 'https://api.openai.com/v1/chat/completions'
+
+// Mirrors src/renderer/src/lib/detect-question.ts (keep in sync).
+const MIN_WORDS = 4
+const MIN_CHARS = 12
+const INTERROGATIVE =
+  /^(who|what|when|where|why|how|which|whose|whom|can|could|would|should|will|do|does|did|is|are|was|were|have|has|had|may|might|explain|tell|describe|walk|compare|define)\b/i
+
+function splitSentences(text) {
+  return text
+    .split(/(?<=[.!?])\s+/)
+    .map((s) => s.trim())
+    .filter(Boolean)
+}
+
+function wordCount(s) {
+  return s.split(/\s+/).filter(Boolean).length
+}
+
+function isQuestionSentence(s) {
+  if (s.length < MIN_CHARS || wordCount(s) < MIN_WORDS) return false
+  if (s.endsWith('?')) return true
+  return INTERROGATIVE.test(s)
+}
+
+function normalizeQuestion(q) {
+  return q
+    .toLowerCase()
+    .replace(/[^\w\s]/g, '')
+    .replace(/\s+/g, ' ')
+    .trim()
+}
+
+function isNearDuplicate(a, b) {
+  const na = normalizeQuestion(a)
+  const nb = normalizeQuestion(b)
+  if (!na || !nb) return false
+  if (na === nb) return true
+  const [shorter, longer] = na.length <= nb.length ? [na, nb] : [nb, na]
+  return longer.includes(shorter) && shorter.length / longer.length >= 0.7
+}
+
+function detectQuestion(text, lastQuestion) {
+  const cleaned = text.trim()
+  if (!cleaned) return null
+  let found = null
+  for (const sentence of splitSentences(cleaned)) {
+    if (isQuestionSentence(sentence)) found = sentence
+  }
+  if (!found) return null
+  if (lastQuestion && isNearDuplicate(found, lastQuestion)) return null
+  return found
+}
+
+const SCRIPT_QUESTIONS = [
+  'Welcome. Can you explain the difference between let and const in JavaScript?',
+  'Good. How would you optimize a slow database query?',
+  'Last one — what is the event loop, in one sentence?'
+]
+const SCRIPT_STATEMENT =
+  'Both are block-scoped. let can be reassigned, const cannot be reassigned.'
 
 // These mirror src/renderer/src/lib/openai.ts exactly.
 const SYSTEM_PROMPT =
@@ -36,12 +97,20 @@ function settingsPath() {
   if (process.env.SMOG_SETTINGS) return process.env.SMOG_SETTINGS
   const home = os.homedir()
   if (process.platform === 'win32') {
-    return path.join(process.env.APPDATA || path.join(home, 'AppData', 'Roaming'), 'desktop', 'settings.json')
+    return path.join(
+      process.env.APPDATA || path.join(home, 'AppData', 'Roaming'),
+      'desktop',
+      'settings.json'
+    )
   }
   if (process.platform === 'darwin') {
     return path.join(home, 'Library', 'Application Support', 'desktop', 'settings.json')
   }
-  return path.join(process.env.XDG_CONFIG_HOME || path.join(home, '.config'), 'desktop', 'settings.json')
+  return path.join(
+    process.env.XDG_CONFIG_HOME || path.join(home, '.config'),
+    'desktop',
+    'settings.json'
+  )
 }
 
 function loadConfig() {
@@ -54,7 +123,10 @@ function loadConfig() {
   } catch {
     raw = {}
   }
-  return { key: raw.openaiApiKey || '', model: process.env.SMOG_MODEL || raw.model || 'gpt-4o-mini' }
+  return {
+    key: raw.openaiApiKey || '',
+    model: process.env.SMOG_MODEL || raw.model || 'gpt-4o-mini'
+  }
 }
 
 async function streamChat({ key, model, messages, onToken }) {
@@ -113,17 +185,46 @@ const bad = (m) => console.log(`  \u001b[31m✗\u001b[0m ${m}`)
 const { key, model } = loadConfig()
 log('\nsmog backend verification')
 log(`model: ${model}`)
+
+let failures = 0
+
+// --- Step 0: detectQuestion (local, no network) ---
+try {
+  log('\n[1/3] detectQuestion — spoken-question detector (no network)')
+  for (const line of SCRIPT_QUESTIONS) {
+    const q = detectQuestion(line)
+    if (!q) throw new Error(`missed question in: ${line}`)
+    ok(`caught: "${q}"`)
+  }
+  if (detectQuestion(SCRIPT_STATEMENT)) {
+    throw new Error('treated a statement as a question')
+  }
+  ok('ignored a non-question statement')
+  if (detectQuestion('huh?') || detectQuestion('ok?')) {
+    throw new Error('treated a short fragment as a question')
+  }
+  ok('ignored short fragments (huh? / ok?)')
+  const first = detectQuestion(SCRIPT_QUESTIONS[0])
+  if (detectQuestion(SCRIPT_QUESTIONS[0], first)) {
+    throw new Error('did not skip a near-duplicate of the last question')
+  }
+  ok('skipped a near-duplicate of the last answered question')
+} catch (e) {
+  bad(e.message)
+  failures++
+}
+
 if (!key) {
-  console.error('\nNo API key found. Run the app once and save a key in Settings, or set OPENAI_API_KEY.')
+  console.error(
+    '\nNo API key found. Run the app once and save a key in Settings, or set OPENAI_API_KEY.'
+  )
   process.exit(1)
 }
 log(`key:   ${key.slice(0, 8)}…${key.slice(-4)}`)
 
-let failures = 0
-
-// --- Step 1: Ask (streaming, context-aware) ---
+// --- Step 2: Ask (streaming, context-aware) ---
 try {
-  log('\n[1/2] Ask — streaming answer with transcript context')
+  log('\n[2/3] Ask — streaming answer with transcript context')
   let firstMs = null
   const t0 = Date.now()
   const answer = await streamChat({
@@ -156,11 +257,14 @@ try {
 
 // --- Step 2: Notes (structured Markdown) ---
 try {
-  log('\n[2/2] Notes — structured Markdown summary')
+  log('\n[3/3] Notes — structured Markdown summary')
   const md = await chatOnce({
     key,
     model,
-    messages: [{ role: 'system', content: NOTES_PROMPT }, { role: 'user', content: SAMPLE_TRANSCRIPT }]
+    messages: [
+      { role: 'system', content: NOTES_PROMPT },
+      { role: 'user', content: SAMPLE_TRANSCRIPT }
+    ]
   })
   console.log('  ' + md.split('\n').slice(0, 7).join('\n  '))
   if (md.length > 40 && /##|summary|key points|action|decision/i.test(md)) {
@@ -175,7 +279,9 @@ try {
 
 log('')
 if (failures === 0) {
-  console.log('\u001b[32m🎉 All backend checks passed — Ask + Notes work with your key/model.\u001b[0m')
+  console.log(
+    '\u001b[32m🎉 All backend checks passed — detect + Ask + Notes work with your key/model.\u001b[0m'
+  )
   process.exit(0)
 }
 console.log(`\u001b[33m⚠ ${failures} check(s) failed.\u001b[0m`)

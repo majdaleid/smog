@@ -21,6 +21,7 @@ export default function SettingsPanel({
   const [language, setLanguage] = useState(settings.language)
   const [theme, setTheme] = useState<Settings['theme']>(settings.theme)
   const [contextLines, setContextLines] = useState(settings.contextLines)
+  const [autoAnswer, setAutoAnswer] = useState(settings.autoAnswer)
   const [showKey, setShowKey] = useState(false)
 
   useEffect(() => {
@@ -32,7 +33,7 @@ export default function SettingsPanel({
   }, [onClose])
 
   function save(): void {
-    onSave({ openaiApiKey, model, sttEngine, language, theme, contextLines })
+    onSave({ openaiApiKey, model, sttEngine, language, theme, contextLines, autoAnswer })
     onClose()
   }
 
@@ -138,6 +139,30 @@ export default function SettingsPanel({
                 className={inputCls}
               />
             </div>
+          </div>
+
+          {/* Auto-answer */}
+          <div>
+            <label className={labelCls}>Auto-answer spoken questions</label>
+            <div className="flex gap-2">
+              {([true, false] as const).map((on) => (
+                <button
+                  key={on ? 'on' : 'off'}
+                  type="button"
+                  onClick={() => setAutoAnswer(on)}
+                  className={`flex-1 rounded-lg border px-2 py-1.5 text-xs ${
+                    autoAnswer === on
+                      ? 'border-accent bg-accent/20 text-white'
+                      : 'border-white/15 bg-white/5 text-white/60 hover:bg-white/10'
+                  }`}
+                >
+                  {on ? 'On' : 'Off'}
+                </button>
+              ))}
+            </div>
+            <p className="mt-1 text-[10px] text-white/40">
+              While listening, detect questions in the transcript and stream an answer on Listen.
+            </p>
           </div>
 
           {/* Theme */}

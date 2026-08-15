@@ -38,5 +38,8 @@ desktop.ini
 # Editor
 .vscode/
 .idea/
+
+# Project MCP (may contain a GitHub PAT — keep the example, not the live file)
+.cursor/mcp.json
 *.swp
 *.swo

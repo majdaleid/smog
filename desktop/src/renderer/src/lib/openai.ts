@@ -1,7 +1,12 @@
 const API_URL = 'https://api.openai.com/v1/chat/completions'
 
-const SYSTEM_PROMPT =
+export const SYSTEM_PROMPT =
   'You are a live copilot. Use the provided live transcript as context. Be concise and direct.'
+
+export const AUTO_ANSWER_PROMPT =
+  'You are a live interview copilot. Someone just asked the following question aloud. ' +
+  'Give a concise spoken-style answer the user can say out loud — short talking points, not an essay. ' +
+  'Use the provided live transcript as context. Be direct.'
 
 export interface AskOptions {
   apiKey: string
@@ -9,12 +14,14 @@ export interface AskOptions {
   question: string
   context: string
   signal?: AbortSignal
+  /** Override the default Ask system prompt (used for auto-answers). */
+  systemPrompt?: string
   onDelta: (token: string) => void
   onDone: () => void
   onError: (message: string) => void
 }
 
-function friendlyError(status: number, body: string): string {
+export function friendlyError(status: number, body: string): string {
   if (status === 401) return 'Invalid OpenAI API key. Add or update it in Settings.'
   if (status === 429) return 'Rate limited or out of quota on your OpenAI account.'
   return `OpenAI request failed (${status}): ${body.slice(0, 200)}`
@@ -24,7 +31,7 @@ function friendlyError(status: number, body: string): string {
  * Stream an answer to a question, attaching recent transcript lines as context.
  */
 export async function askQuestion(opts: AskOptions): Promise<void> {
-  const { apiKey, model, question, context, signal, onDelta, onDone, onError } = opts
+  const { apiKey, model, question, context, signal, systemPrompt, onDelta, onDone, onError } = opts
 
   if (!apiKey) {
     onError('Add your OpenAI API key in Settings to use Ask.')
@@ -32,7 +39,7 @@ export async function askQuestion(opts: AskOptions): Promise<void> {
   }
 
   const messages = [
-    { role: 'system', content: SYSTEM_PROMPT }
+    { role: 'system', content: systemPrompt ?? SYSTEM_PROMPT }
   ]
   if (context.trim()) {
     messages.push({ role: 'user', content: `Live transcript (recent):\n${context}` })

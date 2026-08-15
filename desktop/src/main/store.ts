@@ -20,6 +20,7 @@ function coerce(raw: unknown): Settings {
     if (typeof r['contextLines'] === 'number' && Number.isFinite(r['contextLines'])) {
       out.contextLines = Math.max(1, Math.min(200, Math.floor(r['contextLines'])))
     }
+    if (typeof r['autoAnswer'] === 'boolean') out.autoAnswer = r['autoAnswer']
   }
   return out
 }

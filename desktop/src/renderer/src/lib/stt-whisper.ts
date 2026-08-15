@@ -3,6 +3,11 @@ import type { SttEngine, SttStartOptions } from './types'
 const CHUNK_MS = 7000
 const API_URL = 'https://api.openai.com/v1/audio/transcriptions'
 
+/** Whisper wants ISO-639-1 (`en`); settings store BCP-47 (`en-US`) for Web Speech. */
+function toWhisperLanguage(tag: string): string {
+  return tag.trim().split(/[-_]/)[0]?.toLowerCase() ?? ''
+}
+
 function pickMime(): string {
   const candidates = [
     'audio/webm;codecs=opus',
@@ -95,7 +100,8 @@ export class WhisperEngine implements SttEngine {
     form.append('file', blob, `chunk.${ext}`)
     form.append('model', 'whisper-1')
     form.append('response_format', 'json')
-    if (this.opts.language) form.append('language', this.opts.language)
+    const lang = toWhisperLanguage(this.opts.language)
+    if (lang) form.append('language', lang)
 
     try {
       const res = await fetch(API_URL, {

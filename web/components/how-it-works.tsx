@@ -1,4 +1,4 @@
-import { AudioLines, MousePointerClick, Sparkles } from "lucide-react";
+import { AudioLines, KeyRound, Sparkles } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import { SectionHeading } from "@/components/section-heading";
 
@@ -12,24 +12,24 @@ type Step = {
 const steps: Step[] = [
   {
     number: "01",
-    icon: MousePointerClick,
+    icon: Sparkles,
     title: "Launch the overlay",
     description:
-      "Open smog and pin the translucent panel over any meeting, interview, or screen-share. It floats, always on top.",
+      "Clone the repo and run the desktop app. A translucent panel floats always-on-top over your call.",
   },
   {
     number: "02",
-    icon: AudioLines,
-    title: "It listens & reads",
+    icon: KeyRound,
+    title: "Paste your OpenAI key",
     description:
-      "smog transcribes the conversation in real time and reads on-screen context — slides, prompts, and code — automatically.",
+      "The first screen asks for your key. It is stored locally and only sent to OpenAI. No smog account.",
   },
   {
     number: "03",
-    icon: Sparkles,
-    title: "Ask — get answers live",
+    icon: AudioLines,
+    title: "Listen — get answers live",
     description:
-      "Type or speak a question. Get an instant, context-aware answer in the overlay, with notes generated as you go.",
+      "Start the mic. Spoken questions are answered on the Listen tab. Type in Ask, or generate notes when you are done.",
   },
 ];
 
@@ -39,12 +39,11 @@ export function HowItWorks() {
       <div className="mx-auto w-full max-w-6xl">
         <SectionHeading
           eyebrow="How it works"
-          title="Up and running in seconds"
-          description="No setup rituals, no integrations to configure. Launch it, and it just works on top of whatever you're running."
+          title="Up and running in minutes"
+          description="No signup. Clone, install, paste a key, listen."
         />
 
         <div className="relative mt-16">
-          {/* connecting line (desktop) */}
           <div
             className="absolute left-0 right-0 top-7 hidden h-px bg-gradient-to-r from-transparent via-white/15 to-transparent lg:block"
             aria-hidden="true"

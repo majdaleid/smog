@@ -1,11 +1,11 @@
-# smog — AI Meeting & Interview Copilot (MVP / Proof of Concept)
+# smog — AI Meeting & Interview Copilot
 
-A clean, simple proof-of-concept inspired by [smog-ai.com](https://smog-ai.com). It has two parts:
+Free, open-source overlay: live transcription, instant answers, and notes. Bring your own OpenAI key. Licensed under [MIT](LICENSE).
 
-1. **`desktop/`** — an Electron overlay app: a translucent, always-on-top panel that transcribes audio live, lets you push-to-ask an LLM for instant answers, and auto-generates notes.
-2. **`web/`** — a Next.js marketing landing page in the same glassy aesthetic.
+1. **`desktop/`** — Electron overlay: a translucent, always-on-top panel that transcribes audio, answers spoken or typed questions, and generates notes.
+2. **`web/`** — Next.js landing page for the same product.
 
-> **Positioning.** Built as a general live AI copilot (meetings, interview practice, accessibility/captioning, language learning). The translucent overlay is a UX feature. Deliberately **out of scope**: any "hidden from screen capture / undetectable" mechanics.
+> **Positioning.** A local live copilot (meetings, practice, captioning, language learning). The overlay is a UX feature. Deliberately **out of scope**: hidden-from-capture / “undetectable” mechanics, hosted tokens, and paid plans.
 
 ---
 
@@ -13,7 +13,7 @@ A clean, simple proof-of-concept inspired by [smog-ai.com](https://smog-ai.com).
 
 - **Node.js 18+** and **npm** (developed on Node 22 / npm 10).
 - Internet access (for `npm install` and the OpenAI API).
-- An **OpenAI API key** — required for the **Ask**, **Notes**, and **Whisper** transcription features. The **Web Speech** transcription engine works with no key.
+- An **OpenAI API key** — required for **Ask**, auto-answer, **Notes**, and **Whisper**. The **Web Speech** engine works with no key.
 
 ---
 
@@ -25,14 +25,14 @@ npm install
 npm run dev
 ```
 
-A translucent overlay appears (top-right), always-on-top. Open **Settings** (gear) and paste your OpenAI API key to enable Ask / Notes / Whisper.
+A translucent overlay appears (top-right). On first launch, paste your OpenAI API key in the window. It is stored locally and only sent to OpenAI.
 
 ### Modules
-- **Listen** — live transcription. Two engines (toggle in Settings):
+- **Listen** — live transcription. Spoken questions can auto-answer on this tab.
   - **Web Speech API** (default) — real-time, no key.
   - **Whisper API** — more accurate, requires key.
-- **Ask** — push-to-ask: type a question (it auto-attaches the recent transcript as context) and the answer streams in live.
-- **Notes** — generate structured Markdown notes (summary / key points / decisions / action items) from the transcript; edit and export to `.md`.
+- **Ask** — type a question (recent transcript is attached as context); the answer streams in.
+- **Notes** — generate structured Markdown notes from the transcript; edit and export to `.md`.
 
 ### Global shortcuts (defaults)
 | Action | Shortcut |
@@ -44,7 +44,7 @@ A translucent overlay appears (top-right), always-on-top. Open **Settings** (gea
 (Use `Cmd` instead of `Ctrl` on macOS.)
 
 ### Notes on transcription engines
-- **Web Speech API** runs in Chromium and usually works with no setup. If it errors (`network` / `service-not-allowed`), switch to **Whisper** in Settings — that engine is fully self-contained via your OpenAI key.
+- **Web Speech API** runs in Chromium and usually works with no setup. If it errors (`network` / `service-not-allowed`), switch to **Whisper** in Settings — that engine uses your OpenAI key.
 
 ---
 
@@ -56,7 +56,7 @@ npm install
 npm run dev
 ```
 
-Open the printed local URL to view the marketing site.
+Open the printed local URL to view the site.
 
 ---
 
@@ -65,4 +65,4 @@ Open the printed local URL to view the marketing site.
 - **Web:** Next.js (App Router) + TypeScript + Tailwind + shadcn/ui + lucide-react.
 
 ## Responsible use
-This is a POC for learning/product exploration. Use it ethically — e.g., as a personal accessibility, captioning, or note-taking assistant. Settings (including your API key) are stored locally and never leave your machine except as direct calls to OpenAI.
+Use it ethically — e.g., as a personal accessibility, captioning, or note-taking assistant. Settings (including your API key) are stored locally and never leave your machine except as direct calls to OpenAI.

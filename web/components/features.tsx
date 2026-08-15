@@ -1,4 +1,4 @@
-import { AudioLines, NotebookPen, ScanEye, Sparkles } from "lucide-react";
+import { AudioLines, NotebookPen, Sparkles, Zap } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import { SectionHeading } from "@/components/section-heading";
 
@@ -13,30 +13,30 @@ const features: Feature[] = [
   {
     icon: AudioLines,
     name: "Listen",
-    title: "Real-time transcription",
+    title: "Live transcription",
     description:
-      "Capture every word as it's spoken with low-latency, speaker-aware transcription that streams live into the overlay.",
+      "Capture spoken audio into a timestamped transcript. Web Speech for speed, or Whisper when you want more accuracy.",
+  },
+  {
+    icon: Zap,
+    name: "Auto-answer",
+    title: "Spoken questions, answered",
+    description:
+      "When a question lands in the transcript, smog streams a concise answer on the Listen tab — no typing required.",
   },
   {
     icon: Sparkles,
     name: "Ask",
-    title: "Instant, context-aware answers",
+    title: "Context-aware answers",
     description:
-      "Ask anything mid-call. smog reads the full transcript and serves the right answer in milliseconds.",
-  },
-  {
-    icon: ScanEye,
-    name: "Vision",
-    title: "Read text & code on screen",
-    description:
-      "On-screen vision lets smog see shared slides, LeetCode prompts, and code so answers match what you're looking at.",
+      "Type a follow-up anytime. smog attaches recent transcript lines and streams the reply in the overlay.",
   },
   {
     icon: NotebookPen,
     name: "Notes",
-    title: "Auto-generated, editable notes",
+    title: "Structured notes you can export",
     description:
-      "Walk away with clean, structured notes and action items — editable, exportable, and ready the moment you hang up.",
+      "Turn the transcript into Markdown — summary, key points, decisions, action items — then edit, copy, or download.",
   },
 ];
 
@@ -46,8 +46,8 @@ export function Features() {
       <div className="mx-auto w-full max-w-6xl">
         <SectionHeading
           eyebrow="Features"
-          title="Four superpowers, one overlay"
-          description="smog sits quietly on top of any call and turns it into something you can actually keep up with."
+          title="Four things the overlay actually does"
+          description="smog sits on top of any call and turns speech into a transcript, answers, and notes. Nothing more."
         />
 
         <div className="mt-14 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">

@@ -61,8 +61,15 @@ function createWindow(): void {
 
   // Open external links in the system browser, never inside the overlay.
   mainWindow.webContents.setWindowOpenHandler((details) => {
-    shell.openExternal(details.url)
+    void shell.openExternal(details.url)
     return { action: 'deny' }
+  })
+  mainWindow.webContents.on('will-navigate', (event, url) => {
+    const devUrl = process.env['ELECTRON_RENDERER_URL']
+    if (is.dev && devUrl && url.startsWith(devUrl)) return
+    if (url.startsWith('file:')) return
+    event.preventDefault()
+    void shell.openExternal(url)
   })
 
   // HMR / load: use the vite dev server URL in dev, else the built file.
