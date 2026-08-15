@@ -7,6 +7,20 @@ Free, open-source overlay: live transcription, instant answers, and notes. Bring
 
 > **Positioning.** A local live copilot (meetings, practice, captioning, language learning). The overlay is a UX feature. Deliberately **out of scope**: hidden-from-capture / “undetectable” mechanics, hosted tokens, and paid plans.
 
+## Screenshots
+
+Spoken questions are detected in the transcript and answered on Listen.
+
+![Live answer while listening](docs/screenshots/listen-live.png)
+
+Tap the mic to start. Whisper or Web Speech; auto-answer can stay on.
+
+![Listen idle](docs/screenshots/listen-idle.png)
+
+Paste your OpenAI key in Settings. It stays on this machine.
+
+![Settings with bring-your-own key](docs/screenshots/settings.png)
+
 ---
 
 ## Prerequisites
