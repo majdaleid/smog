@@ -7,7 +7,10 @@
   "updateContentCommand": "cd web && npm ci",
 
   // Runs on every container start, including resume.
-  "postStartCommand": "cd web && npm run dev",
+  // The dev server is backgrounded on purpose: a lifecycle command must return,
+  // and a foreground server never exits, which leaves setup hanging at
+  // "Running postStartCommand..." forever. Output goes to /tmp/smog-dev.log.
+  "postStartCommand": "cd web && nohup npm run dev < /dev/null > /tmp/smog-dev.log 2>&1 & sleep 2",
 
   "forwardPorts": [3000],
   "portsAttributes": {
