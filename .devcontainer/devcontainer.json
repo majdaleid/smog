@@ -1,0 +1,25 @@
+{
+  // Codespaces opens at the repository root, so lifecycle commands step into web/.
+  "name": "smog",
+  "image": "mcr.microsoft.com/devcontainers/javascript-node:22",
+
+  // Installed in updateContentCommand so prebuilds can cache it.
+  "updateContentCommand": "cd web && npm ci",
+
+  // Runs on every container start, including resume.
+  "postStartCommand": "cd web && npm run dev",
+
+  "forwardPorts": [3000],
+  "portsAttributes": {
+    "3000": { "label": "smog web", "onAutoForward": "openPreview" }
+  },
+
+  // desktop/ is deliberately not installed: its postinstall downloads Electron,
+  // which cannot run in a headless container.
+  "secrets": {
+    "OPENAI_API_KEY": {
+      "description": "Only needed for the desktop app's OpenAI features; the web landing page does not use it.",
+      "documentationUrl": "https://github.com/majdaleid/smog#prerequisites"
+    }
+  }
+}
