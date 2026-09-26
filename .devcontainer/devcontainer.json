@@ -11,7 +11,9 @@
 
   "forwardPorts": [3000],
   "portsAttributes": {
-    "3000": { "label": "smog web", "onAutoForward": "openPreview" }
+    // openBrowser, not openPreview: the forwarded URL authenticates through
+    // github.com, which sends X-Frame-Options, so an embedded preview is blocked.
+    "3000": { "label": "smog web", "onAutoForward": "openBrowser" }
   },
 
   // desktop/ is deliberately not installed: its postinstall downloads Electron,
